@@ -5,6 +5,8 @@ Heroku Integration - Salesforce API Access (Java)
 
 This sample application showcases how to extend a Heroku web application by integrating it with Salesforce APIs, enabling seamless data exchange and automation across multiple connected Salesforce orgs. It also includes a demonstration of the Salesforce Bulk API, which is optimized for handling large data volumes efficiently.
 
+<img src="images/index.jpg" width="50%" alt="Index">
+
 Requirements
 ------------
 - Heroku login
@@ -13,8 +15,8 @@ Requirements
 - Salesforce CLI installed
 - Login information for one or more Development or Sandbox orgs
 
-Local Development
------------------
+Local Development and Testing
+-----------------------------
 
 You do not need to deploy your application but you do need to configure it with Heroku.
 
@@ -28,10 +30,38 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-Navigate to `https://localhost:5000` to run the application. To access multiple Salesforce orgs, repeat the `salesforce:connect` command above with different org logins and connection names, then update the `INTEGRATION_NAMES` with a comma delimiated list of connection names. The sample code will automatically query for `Account` in each org and display the results.
+Navigate to `https://localhost:5000` to observe a list of accounts from the connected org.
 
-Deploy to Heoku
------------------
+**Multiple Org Connections**
+
+To access multiple Salesforce orgs, repeat the `salesforce:connect` command above with different org logins and connection names, then update the `CONNECTION_NAMES` environment variable within the `.env` file with a comma delimiated list of connection names (example shown below). The sample code will automatically query for `Account` in each org and display the results.
+
+```
+CONNECTION_NAMES=my-org,my-org-sales-a
+```
+
+**Bulk API Inserts**
+
+This sample includes a demonstration of using the Salesforce Bulk API using connections formed with the Heroku Integration add-on. To see this in action obtain an org that is empty or that you are using for testing purposes only. Repeat the `salesforce:connect` command above using the connection name `empty-org` and then update the `CONNECTION_NAMES` environment variable within `.env` with a comma delimiated list of connection names (example shown above). Restart the application using the `mvn spring-boot:run` command and you will see in the console output the following: 
+
+```
+Starting Bulk API process for 'empty-org'
+Created Bulk API job: 750bm00000GtITrAAN
+Submitted batch: 751bm00000CaqKYAAZ
+Batch 751bm00000CavSKAAZ - State: Queued
+Batch 751bm00000CavSKAAZ - State: InProgress
+Batch 751bm00000CavSKAAZ - State: Completed
+Batch processing complete.
+```
+
+Once the processing has complete refresh `https://localhost:5000` to observe the records that have been bulkloaded. Note to avoid duplicate inserts the sample code checks if prior bulk inserts have been run each time the application starts. To reset the Bulk API part of this sample run the following Apex code from the `sf` command line (example assumes `empty-org` is also a known `sf` CLI authorized org alias).
+
+```
+   echo "delete [SELECT Id FROM Account WHERE Name LIKE 'Bulk Account%'];" | sf apex run -o empty-org
+```
+
+Deploy to Heroku
+----------------
 
 ```
 heroku create
