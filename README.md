@@ -4,17 +4,20 @@ Heroku Integration - Salesforce API Access (Java)
 > [!IMPORTANT]
 > For use with the Heroku Integration and Heroku Eventing pilots only
 
+# Architecture Overview
+
 This sample application showcases how to extend a Heroku web application by integrating it with Salesforce APIs, enabling seamless data exchange and automation across multiple connected Salesforce orgs. It also includes a demonstration of the Salesforce Bulk API, which is optimized for handling large data volumes efficiently.
 
 <img src="images/index.jpg" width="50%" alt="Index">
 
-Requirements
-------------
+# Requirements
 - Heroku login
 - Heroku Integration Pilot enabled
 - Heroku CLI installed
+- Heroku Integration Pilot CLI plugin is installed
 - Salesforce CLI installed
-- Login information for one or more Development or Sandbox orgs
+- Login information for one or more Scratch, Development or Sandbox orgs
+- Watch the [Introduction to the Heroku Integration Pilot for Developers](https://www.youtube.com/watch?v=T5kOGNuTCLE) video 
 
 Local Development and Testing
 -----------------------------
