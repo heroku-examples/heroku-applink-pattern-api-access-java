@@ -1,8 +1,5 @@
-Heroku Integration - Salesforce API Access (Java)
-=================================================
-
-> [!IMPORTANT]
-> For use with the Heroku Integration and Heroku Eventing pilots only
+Heroku AppLink - Salesforce API Access (Java)
+=============================================
 
 # Architecture Overview
 
@@ -26,9 +23,10 @@ You do not need to deploy your application but you do need to configure it with 
 
 ```
 heroku create
-heroku addons:create heroku-integration
-heroku salesforce:connect my-org --store-as-run-as-user
+heroku addons:create heroku-applink --wait
+heroku salesforce:authorizations:add my-org
 heroku config:set CONNECTION_NAMES=my-org
+heroku config:set HEROKU_APP_ID="$(heroku apps:info --json | jq -r '.app.id')"
 heroku config --shell > .env
 mvn clean install
 mvn spring-boot:run
@@ -69,9 +67,10 @@ Deploy to Heroku
 
 ```
 heroku create
-heroku addons:create heroku-integration
-heroku salesforce:connect my-org --store-as-run-as-user
+heroku addons:create heroku-applink --wait
+heroku salesforce:authorizations:add my-org
 heroku config:set CONNECTION_NAMES=my-org
+heroku config:set HEROKU_APP_ID="$(heroku apps:info --json | jq -r '.app.id')"
 git push heroku main
 heroku open
 ```
