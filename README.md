@@ -5,7 +5,7 @@ Heroku AppLink - Salesforce API Access (Java)
 
 This sample application showcases how to extend a Heroku web application by integrating it with Salesforce APIs, enabling seamless data exchange and automation across multiple connected Salesforce orgs. It also includes a demonstration of the Salesforce Bulk API, which is optimized for handling large data volumes efficiently.
 
-<img src="images/index.jpg" width="50%" alt="Index">
+<img src="index.jpg" width="50%" alt="Index">
 
 # Requirements
 - Heroku login
