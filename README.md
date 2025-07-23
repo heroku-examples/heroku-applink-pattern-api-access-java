@@ -9,9 +9,9 @@ This sample application showcases how to extend a Heroku web application by inte
 
 # Requirements
 - Heroku login
-- Heroku Integration Pilot enabled
+- Heroku AppLink enabled
 - Heroku CLI installed
-- Heroku Integration CLI plugin is installed
+- Heroku AppLink CLI plugin is installed
 - Salesforce CLI installed
 - Login information for one or more Scratch, Development or Sandbox orgs
 
@@ -43,7 +43,7 @@ CONNECTION_NAMES=my-org,my-org-sales-a
 
 **Bulk API Inserts**
 
-This sample includes a demonstration of using the Salesforce Bulk API using connections formed with the Heroku Integration add-on. To see this in action obtain an org that is empty or that you are using for testing purposes only. Repeat the `salesforce:authorizations` command above using the connection name `empty-org` and then update the `CONNECTION_NAMES` environment variable within `.env` with a comma delimiated list of connection names (example shown above). Restart the application using the `mvn spring-boot:run` command and you will see in the console output the following: 
+This sample includes a demonstration of using the Salesforce Bulk API using connections formed with Heroku AppLink. To see this in action obtain an org that is empty or that you are using for testing purposes only. Repeat the `salesforce:authorizations` command above using the connection name `empty-org` and then update the `CONNECTION_NAMES` environment variable within `.env` with a comma delimiated list of connection names (example shown above). Restart the application using the `mvn spring-boot:run` command and you will see in the console output the following: 
 
 ```
 Starting Bulk API process for 'empty-org'
@@ -93,7 +93,7 @@ Other Samples
 
 | Sample | What it covers? |
 | ------ | --------------- |
-| [Salesforce API Access - Java](https://github.com/heroku-examples/heroku-integration-pattern-api-access-java) | This sample application showcases how to extend a Heroku web application by integrating it with Salesforce APIs, enabling seamless data exchange and automation across multiple connected Salesforce orgs. It also includes a demonstration of the Salesforce Bulk API, which is optimized for handling large data volumes efficiently. |
-| [Extending Apex, Flow and Agentforce - Java](https://github.com/heroku-examples/heroku-integration-pattern-org-action-java) | This sample demonstrates importing a Heroku application into an org to enable Apex, Flow, and Agentforce to call out to Heroku. For Apex, both synchronous and asynchronous invocation are demonstrated, along with securely elevating Salesforce permissions for processing that requires additional object or field access. |
-| [Scaling Batch Jobs with Heroku - Java](https://github.com/heroku-examples/heroku-integration-pattern-org-job-java) | This sample seamlessly delegates the processing of large amounts of data with significant compute requirements to Heroku Worker processes. It also demonstrates the use of the Unit of Work aspect of the SDK (JavaScript only for the pilot) for easier utilization of the Salesforce Composite APIs. |
-| [Using Eventing to drive Automation and Communication](https://github.com/heroku-examples/heroku-integration-pattern-eventing-java) | This sample extends the batch job sample by adding the ability to use eventing to start the work and notify users once it completes using Custom Notifications. These notifications are sent to the user's desktop or mobile device running Salesforce Mobile. Flow is used in this sample to demonstrate how processing can be handed off to low-code tools such as Flow. |
+| [Salesforce API Access - Java](https://github.com/heroku-examples/heroku-applink-pattern-api-access-java) | This sample application showcases how to extend a Heroku web application by integrating it with Salesforce APIs, enabling seamless data exchange and automation across multiple connected Salesforce orgs. It also includes a demonstration of the Salesforce Bulk API, which is optimized for handling large data volumes efficiently. |
+| [Extending Apex, Flow and Agentforce - Java](https://github.com/heroku-examples/heroku-applink-pattern-org-action-java) | This sample demonstrates importing a Heroku application into an org to enable Apex, Flow, and Agentforce to call out to Heroku. For Apex, both synchronous and asynchronous invocation are demonstrated, along with securely elevating Salesforce permissions for processing that requires additional object or field access. |
+| [Scaling Batch Jobs with Heroku - Java](https://github.com/heroku-examples/heroku-applink-pattern-org-job-java) | This sample seamlessly delegates the processing of large amounts of data with significant compute requirements to Heroku Worker processes. It also demonstrates the use of the Unit of Work aspect of the SDK (JavaScript only for the pilot) for easier utilization of the Salesforce Composite APIs. |
+| [Using Eventing to drive Automation and Communication](https://github.com/heroku-examples/heroku-applink-pattern-eventing-java) | This sample extends the batch job sample by adding the ability to use eventing to start the work and notify users once it completes using Custom Notifications. These notifications are sent to the user's desktop or mobile device running Salesforce Mobile. Flow is used in this sample to demonstrate how processing can be handed off to low-code tools such as Flow. |
