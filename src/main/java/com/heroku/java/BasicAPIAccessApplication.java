@@ -25,16 +25,42 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Main Spring Boot application class that demonstrates Salesforce API access
+ * through Heroku AppLink. This application showcases:
+ * <ul>
+ *   <li>Querying Account records from multiple Salesforce orgs</li>
+ *   <li>Bulk API operations for inserting large volumes of Account records</li>
+ * </ul>
+ * 
+ * <p>The application automatically starts a bulk data insertion process on startup
+ * if an 'empty-org' connection is configured and no existing bulk accounts are found.
+ * 
+ * @author Heroku
+ * @version 1.0
+ */
 @SpringBootApplication
 @Controller
 @EnableAsync
 public class BasicAPIAccessApplication {
 
+    /** Logger instance for this class. */
     private static final Logger logger = LoggerFactory.getLogger(BasicAPIAccessApplication.class);
 
+    /** Salesforce client for managing connections to multiple Salesforce orgs. */
     @Autowired
     private SalesforceClient salesforceClient;
 
+    /**
+     * Handles the root web request and displays Account records from all configured
+     * Salesforce connections.
+     * 
+     * <p>Queries each connected Salesforce org for Account records and formats them
+     * for display in the view template.
+     * 
+     * @param model the Spring MVC model map to populate with account data
+     * @return the view name "index" to render the accounts page
+     */
     @GetMapping("/")
     public String index(Map<String, Object> model) {
         // Store accounts for each connection
@@ -63,6 +89,19 @@ public class BasicAPIAccessApplication {
         return "index";
     }
 
+    /**
+     * Event listener that triggers bulk data insertion when the application is ready.
+     * 
+     * <p>This method checks for an 'empty-org' connection and verifies if bulk accounts
+     * already exist. If no bulk accounts are found, it starts an asynchronous process
+     * to insert 1000 sample Account records using the Salesforce Bulk API.
+     * 
+     * <p>The method will skip bulk insertion if:
+     * <ul>
+     *   <li>No 'empty-org' connection is configured</li>
+     *   <li>Bulk Account records already exist in the org</li>
+     * </ul>
+     */
     @EventListener(ApplicationReadyEvent.class)
     public void startBulkDataInsertion() {
         Map<String, PartnerConnection> connections = salesforceClient.getConnections();
@@ -86,6 +125,27 @@ public class BasicAPIAccessApplication {
         new Thread(() -> insertBulkAccounts(partnerConnection)).start();
     }
 
+    /**
+     * Asynchronously inserts 1000 Account records into Salesforce using the Bulk API.
+     * 
+     * <p>This method:
+     * <ol>
+     *   <li>Creates a Bulk API job for Account insertions</li>
+     *   <li>Generates CSV data for 1000 sample accounts</li>
+     *   <li>Submits a batch to the Bulk API</li>
+     *   <li>Polls for batch completion status</li>
+     *   <li>Closes the job once processing is complete</li>
+     * </ol>
+     * 
+     * <p>The job is automatically closed when:
+     * <ul>
+     *   <li>Batch processing completes successfully</li>
+     *   <li>Batch processing fails</li>
+     *   <li>An error occurs during batch creation or status checking</li>
+     * </ul>
+     * 
+     * @param partnerConnection the Salesforce PartnerConnection to use for the bulk operation
+     */
     @Async
     public void insertBulkAccounts(PartnerConnection partnerConnection) {
         try {
@@ -123,6 +183,13 @@ public class BasicAPIAccessApplication {
                 logger.info("Submitted batch: {}", batch.getId());
             } catch (AsyncApiException e) {
                 logger.error("Failed to create batch: {}", e.getMessage());
+                // Closing the batch job
+                try {
+                    bulkConnection.closeJob(job.getId());
+                    logger.info("Closed job: {}", job.getId());
+                } catch (AsyncApiException closeException) {
+                    logger.error("Failed to close job: {}", closeException.getMessage());
+                }
                 return;
             }
 
@@ -134,11 +201,25 @@ public class BasicAPIAccessApplication {
                         logger.info("Batch {} - State: {}", bi.getId(), bi.getState());
                         if (bi.getState() == BatchStateEnum.Completed || bi.getState() == BatchStateEnum.Failed) {
                             logger.info("Batch processing complete.");
+                            // Closing the batch job
+                            try {
+                                bulkConnection.closeJob(job.getId());
+                                logger.info("Closed job: {}", job.getId());
+                            } catch (AsyncApiException e) {
+                                logger.error("Failed to close job: {}", e.getMessage());
+                            }
                             return;
                         }
                     }
                 } catch (AsyncApiException e) {
                     logger.error("Error fetching batch status: {}", e.getMessage());
+                    // Closing the batch job
+                    try {
+                        bulkConnection.closeJob(job.getId());
+                        logger.info("Closed job: {}", job.getId());
+                    } catch (AsyncApiException closeException) {
+                        logger.error("Failed to close job: {}", closeException.getMessage());
+                    }
                     return;
                 }
             }
@@ -148,6 +229,15 @@ public class BasicAPIAccessApplication {
         }
     }
 
+    /**
+     * Creates a BulkConnection from a PartnerConnection by extracting session
+     * information and converting the SOAP endpoint to the async REST endpoint.
+     * 
+     * @param partnerConnection the PartnerConnection to derive the BulkConnection from
+     * @return a configured BulkConnection instance
+     * @throws ConnectionException if there's an error accessing connection configuration
+     * @throws AsyncApiException if there's an error creating the BulkConnection
+     */
     private BulkConnection getBulkConnection(PartnerConnection partnerConnection) throws ConnectionException, AsyncApiException {
         ConnectorConfig config = new ConnectorConfig();
         config.setSessionId(partnerConnection.getSessionHeader().getSessionId());
@@ -156,6 +246,11 @@ public class BasicAPIAccessApplication {
         return new BulkConnection(config);
     }
 
+    /**
+     * Main entry point for the Spring Boot application.
+     * 
+     * @param args command-line arguments passed to the application
+     */
     public static void main(String[] args) {
         SpringApplication.run(BasicAPIAccessApplication.class, args);
     }
